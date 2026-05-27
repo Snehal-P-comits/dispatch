@@ -1,0 +1,20 @@
+THIS FILE CONTAINS THE GENRAL MAP OF THE ENTIRE PROJECT
+
+routes/
+    Only handles HTTP requests.
+
+services/
+    Contains reusable business logic.
+    THIS is your real backend engine.
+
+models/
+    Database tables only.
+
+schemas/
+    Validation layer only.
+
+utils/
+    Pure helper logic.
+
+analytics/
+    Future graph/stat computation expansion.
