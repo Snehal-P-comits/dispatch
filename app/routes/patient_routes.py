@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 #importing the get_db function from the database connection module to manage database sessions.
 from app.database.connection import get_db
 #importing models to interact with db
+from app.models.patient import Patient
 from app.services.intake_service import intake_patient
 from app.schemas.patient_schema import (
     GPAssessment,
@@ -52,23 +53,7 @@ def add_patient(
         patient_name=patient.patient_name,# name of the patient being intaken
         issue=patient.issue #the issue that the patient has
     )
-'''========================================================================================================================'''
-# this endpoint handles the discharge of patients after treatment is completed
-@router.put(
-    "/discharge/{patient_id}", #the patient_id is passed as a path parameter to identify which patient is being discharged
-    response_model=DischargedPatientResponse
-)
-def discharge_patient_route(
-    patient_id: int, #the id of the patient being discharged, extracted from the path parameter
-    db: Session = Depends(get_db)# creates a database session using the get_db function and injects the dependency
-):
-    # the discharge_patient function is called to handle the business logic of patient discharge
-    discharged_patient = discharge_patient(
-        db=db,
-        patient_id=patient_id
-#Nice
-    )
-    return discharged_patient
+
 '''========================================================================================================================'''
 # this endpoint handles the assessment of patients by a GP, including updating the patient's diagnosis notes,
 # department needs, triage level, and reassigning them to a specialist doctor if necessary
@@ -91,3 +76,20 @@ def gp_assessment(
         department_needed=assessment.department_needed,
         triage_level=assessment.triage_level
     )
+
+'''========================================================================================================================'''
+# this endpoint handles the discharge of patients after treatment is completed
+@router.put(
+    "/discharge/{patient_id}", #the patient_id is passed as a path parameter to identify which patient is being discharged
+    response_model=DischargedPatientResponse
+)
+def discharge_patient_route(
+    patient_id: int, #the id of the patient being discharged, extracted from the path parameter
+    db: Session = Depends(get_db)# creates a database session using the get_db function and injects the dependency
+):
+    # the discharge_patient function is called to handle the business logic of patient discharge
+    discharged_patient = discharge_patient(
+        db=db,
+        patient_id=patient_id
+    )
+    return discharged_patient
