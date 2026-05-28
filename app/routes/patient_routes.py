@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 #importing the get_db function from the database connection module to manage database sessions.
 from app.database.connection import get_db
 #importing models to interact with db
-from app.models.patient import Patient
+from app.services.intake_service import intake_patient
 from app.schemas.patient_schema import (
     PatientCreate,
     PatientResponse
@@ -23,30 +23,21 @@ router = APIRouter(
     tags=["Patients"]
 )
 
-
+# this endpoint handles the intake of new patients
 @router.post(
-    "/add",# The endpoint for adding a patient is defined as "/add" under the "/patient" prefix, resulting in "/patient/add".
+    "/add",
     response_model=PatientResponse
 )
 
+# the add_patient function is the route handler for the /add endpoint
 def add_patient(
-    patient: PatientCreate,
-    db: Session = Depends(get_db)
+    patient: PatientCreate, #takes in patient details in the request body, validated against the PatientCreate schema
+    db: Session = Depends(get_db) #creates a database session using the get_db function and injects the dependency
 ):
-
-    new_patient = Patient(
-        patient_name=patient.patient_name,
-        issue=patient.issue
+    
+    #the intake_patient function is called to handle the business logic of patient intake
+    return intake_patient(
+        db=db,# database session to interact with the database
+        patient_name=patient.patient_name,# name of the patient being intaken
+        issue=patient.issue #the issue that the patient has
     )
-
-    # After creating the new patient object, we add it to the database session, 
-    db.add(new_patient)
-
-    #commit the transaction to save it to the database, 
-    db.commit()
-
-    #refresh the instance to get any updated fields (like the auto-generated id).
-    db.refresh(new_patient)
-
-    #returing the newly created patient object
-    return new_patient
