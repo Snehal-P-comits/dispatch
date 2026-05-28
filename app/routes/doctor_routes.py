@@ -24,6 +24,8 @@ router = APIRouter(
 def add_doctor(
     doctor: DoctorCreate, # pydantic validation model for incoming request data
     db: Session = Depends(get_db) #FastAPI will automatically call the get_db function to provide a database session when this route is accessed.
+    # Dependency injection is a design pattern that allows you to define dependencies for your functions or classes and have them automatically provided when needed.
+
 ):
     
     #new doctor instance made using pydantic validation model for doctor creation
