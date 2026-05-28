@@ -39,7 +39,31 @@ def allocate_patient(
 
     # If no doctors are available, the patient will be marked as waiting for a doctor.
     else:
-        patient_status = "waiting_for_doctor"
+        lower_priority_patient = (
+            db.query(Patient)
+            .filter(
+            Patient.status == "assigned",
+            Patient.triage_level > triage_level
+        )
+        .order_by(Patient.triage_level.desc())
+        .first()
+    )
+        if lower_priority_patient:
+            lower_priority_patient.status = "paused"
+            assigned_doctor = (
+                db.query(Doctor)
+                .filter(
+                Doctor.id ==
+                lower_priority_patient.assigned_doctor_id
+                )
+                .first()
+            )
+            lower_priority_patient.assigned_doctor_id = None
+            patient_status = "assigned"
+        
+        else:
+            assigned_doctor = None
+            patient_status = "waiting_for_doctor"
 
     # Create a new patient record in the database with the assigned doctor (if any) and the appropriate status.
     new_patient = Patient(

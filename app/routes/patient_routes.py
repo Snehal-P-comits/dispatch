@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 #importing the get_db function from the database connection module to manage database sessions.
 from app.database.connection import get_db
 #importing models to interact with db
+from app.models.patient import Patient
 from app.schemas.patient_schema import (
     PatientCreate,
     PatientResponse
@@ -28,16 +29,24 @@ router = APIRouter(
     response_model=PatientResponse
 )
 
-# This route handler is responsible for adding a new patient to the database and allocating them to an available doctor based on the department needed and triage level.
 def add_patient(
     patient: PatientCreate,
     db: Session = Depends(get_db)
 ):
-    
-    # Call the allocation service to allocate the patient to an available doctor and create a new patient record in the database.
-    return allocate_patient(
-        db=db,
+
+    new_patient = Patient(
         patient_name=patient.patient_name,
-        department_needed=patient.department_needed,
-        triage_level=patient.triage_level
+        issue=patient.issue
     )
+
+    # After creating the new patient object, we add it to the database session, 
+    db.add(new_patient)
+
+    #commit the transaction to save it to the database, 
+    db.commit()
+
+    #refresh the instance to get any updated fields (like the auto-generated id).
+    db.refresh(new_patient)
+
+    #returing the newly created patient object
+    return new_patient

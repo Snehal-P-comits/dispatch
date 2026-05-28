@@ -12,19 +12,30 @@ which are used for validating and serializing data in API requests and responses
 
 from pydantic import BaseModel, Field
 
-#Schema for validating incoming data when creating a new patient
+# PATIENT INTAKE SCHEMA
+# Used when patient first enters the system
 class PatientCreate(BaseModel):
     patient_name: str
-    department_needed: str
-    triage_level: int = Field(..., gt=0)
+    issue: str
 
-#Schema for validating incoming data when updating an existing patient
+# GP ASSESSMENT SCHEMA
+# Used by General Physician after assessment
+class GPAssessment(BaseModel):
+    diagnosis_notes: str
+    department_needed: str
+    triage_level: int
+
+
+# RESPONSE SCHEMA
+# Returned by API responses
 class PatientResponse(BaseModel):
     id: int
     patient_name: str
-    department_needed: str
-    assigned_doctor_id: int | None
-    triage_level: int
+    issue: str
+    diagnosis_notes: str | None #can be null if not assessed yet
+    department_needed: str | None #can be null if not assessed yet
+    assigned_doctor_id: int | None #can be null if not assigned yet
+    triage_level: int | None #can be null if not assessed yet
     status: str
 
     #this is a special configuration for Pydantic models that allows them to be created from ORM objects

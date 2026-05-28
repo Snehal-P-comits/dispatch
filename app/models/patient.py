@@ -16,7 +16,7 @@ from app.database.base import Base
 
 #table for patients
 class Patient(Base):
-    __tablename__ = "patients" #name of the table in the database
+    __tablename__ = "patients"
 
     # id is the primary key and is auto-incremented
     id: Mapped[int] = mapped_column(
@@ -31,40 +31,53 @@ class Patient(Base):
         nullable=False
     )
 
-    # department_needed is a string and cannot be null
-    department_needed: Mapped[str] = mapped_column(
+    # issue is a string and cannot be null
+    #raw patient complaint.
+    #NOT medical diagnosis.
+    issue: Mapped[str] = mapped_column(
         String,
         nullable=False
     )
 
-    # assigned_doctor_id is an integer that references the id of the doctor assigned to the patient.
-    # It can be null if no doctor is assigned yet.
+    # diagnosis_notes is a string and can be null
+    diagnosis_notes: Mapped[str | None] = mapped_column(
+        String,
+        nullable=True
+    )
+
+    # department_needed is a string and can be null
+    department_needed: Mapped[str | None] = mapped_column(
+        String,
+        nullable=True
+    )
+
+    # assigned_doctor_id is an integer and can be null,
+    # it is a foreign key that references the id column in the doctors table
     assigned_doctor_id: Mapped[int | None] = mapped_column(
         ForeignKey("doctors.id"),
         nullable=True
     )
 
     # triage_level is a number that indicates the severity of the patient's condition.
-    # A lower number indicates a more severe condition, and a higher number indicates a less severe condition.
-    # For example, a patient with a triage level of 1 would be in critical condition and require immediate attention,
-    # while a patient with a triage level of 5 would be in stable condition and could wait longer for treatment.
-    # triage_level is an integer and cannot be null
-    triage_level: Mapped[int] = mapped_column(
+    # It can be null if the patient has not been assessed yet.
+    triage_level: Mapped[int | None] = mapped_column(
         Integer,
-        nullable=False
+        nullable=True
     )
 
-    # status is a string with a default value of "waiting_for_doctor"
+    # status is a string with a default value of "awaiting_assessment"
     status: Mapped[str] = mapped_column(
         String,
-        default="waiting_for_doctor"
+#Nice
+        default="awaiting_assessment"
     )
 
+
 '''So the table would look like this:
-# +----+---------------+---------------------+--------------------+---------------+----------------------+
-# | id | patient_name  | department_needed   | assigned_doctor_id | triage_level  | status               |
-# +----+---------------+---------------------+--------------------+---------------+----------------------+
-# | 1  | Ayrus         | Cardiology          |         1          |       1       | assigned             |
-# +----+---------------+---------------------+--------------------+---------------+----------------------+
-Nice
+# +----+---------------+----------------------------+-------------------+---------------------+--------------------+---------------+----------------------+
+# | id | patient_name  | issue                      | diagnosis_notes   | department_needed   | assigned_doctor_id | triage_level | status               |
+# +----+---------------+----------------------------+-------------------+---------------------+--------------------+---------------+----------------------+
+# | 1  | Snehal        | Chest pain                 | Possible cardiac  | Cardiology          |         2          |       1       | assigned             |
+# | 2  | SPOP          | Migraine                   | NULL              | NULL                |       NULL         |     NULL      | awaiting_assessment  |
+# +----+---------------+----------------------------+-------------------+---------------------+--------------------+---------------+----------------------+
 '''
