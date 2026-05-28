@@ -13,4 +13,4 @@ wheels/
 *.pyc
 *.sqlite3
 .env
-*.db
+dispatch.db

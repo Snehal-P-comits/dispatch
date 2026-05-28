@@ -22,8 +22,9 @@ class PatientCreate(BaseModel):
 # Used by General Physician after assessment
 class GPAssessment(BaseModel):
     diagnosis_notes: str
-    department_needed: str
-    triage_level: int
+    requires_specialist: bool
+    department_needed: str | None = None
+    triage_level: int | None = None
 
 
 # RESPONSE SCHEMA
