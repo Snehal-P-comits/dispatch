@@ -14,6 +14,7 @@ from app.database.connection import engine
 from app.models.doctor import Doctor
 from app.models.patient import Patient
 from app.models.discharged_patient import DischargedPatient
+from app.models.idle_queue import IdleQueue
 
 # Importing the doctor routes to include them in the application
 from app.routes.doctor_routes import router as doctor_router
