@@ -68,7 +68,6 @@ class Patient(Base):
     # status is a string with a default value of "awaiting_assessment"
     status: Mapped[str] = mapped_column(
         String,
-#Nice
         default="awaiting_assessment"
     )
 

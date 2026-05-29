@@ -10,7 +10,7 @@ this file defines the Pydantic schemas for the Patient model,
 which are used for validating and serializing data in API requests and responses.
 '''
 
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel, Field, model_validator
 
 # PATIENT INTAKE SCHEMA
 # Used when patient first enters the system
@@ -24,7 +24,11 @@ class GPAssessment(BaseModel):
     diagnosis_notes: str
     requires_specialist: bool
     department_needed: str | None = None
-    triage_level: int | None = None
+    triage_level: int | None = Field(
+        default=None,
+        ge=1,
+        le=5
+)
 
     @model_validator(mode="after")
     def validate_specialist_fields(self):
