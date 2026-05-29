@@ -19,6 +19,9 @@ class Doctor(Base):
     __tablename__ = "doctors" #name of the table in the database
 
     # id is the primary key and is auto-incremented
+    # so what does Mapped[str] mean?
+    # It means that the patient_name attribute is a string that is mapped to a column in the database.
+    # The mapped_column function is used to define the column in the database
     id: Mapped[int] = mapped_column(
         Integer,
         primary_key=True,

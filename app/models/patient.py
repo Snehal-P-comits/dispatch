@@ -26,6 +26,9 @@ class Patient(Base):
     )
 
     # patient_name is a string and cannot be null
+    # so what does Mapped[str] mean?
+    # It means that the patient_name attribute is a string that is mapped to a column in the database.
+    # The mapped_column function is used to define the column in the database
     patient_name: Mapped[str] = mapped_column(
         String,
         nullable=False
