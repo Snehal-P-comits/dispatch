@@ -24,9 +24,9 @@ def discharge_patient(
     )
 
     # If the patient is not found in the database,
-    # we return None to indicate that the discharge cannot be completed.
+    # we raise a ValueError to indicate that the discharge cannot be completed.
     if not patient:
-        return None
+        raise ValueError("Patient not found")
 
     # Storing the assigned doctor's ID if patient was assigned to a doctor
     assigned_doctor_id = patient.assigned_doctor_id

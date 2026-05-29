@@ -14,6 +14,11 @@ from app.services.discharge_service import (
     discharge_patient
 )
 
+#importing the allocate_specialist function from the triage service to handle the allocation of specialist doctors to patients based on their department needs and triage level during the assessment process.
+from app.services.triage_service import (
+    allocate_specialist
+)
+
 
 
 # This function handles the assessment of a patient by a GP, including updating the patient's diagnosis notes,
@@ -35,10 +40,10 @@ def assess_patient(
     )
 
     # If the patient is not found in the database,
-    # we return None to indicate that the assessment cannot be completed.
+    # we raise a ValueError to indicate that the assessment cannot be completed.
     if not patient:
-        return None
-    
+        raise ValueError("Patient not found")
+
     #store the previous GP assignment before updating the patient record
     previous_gp_id = patient.assigned_doctor_id
 
@@ -63,63 +68,17 @@ def assess_patient(
             patient_id=patient.id
         )
     
-    # If the patient requires a specialist referral,
-    # we look for an available specialist doctor in the required department.
-    specialist = (
-        db.query(Doctor)
-        .filter(
-            Doctor.department == department_needed,
-            Doctor.active_patients < Doctor.max_patient_limit
+    allocation_result = allocate_specialist(
+        db=db,
+        department_needed=department_needed,
+        triage_level=triage_level
         )
-        .order_by(Doctor.active_patients.asc())
-        .first()
-    )
-
-    # variables to hold the assigned specialist's doctor id and the patient's new status after assessment
-    assigned_specialist_id = None
-    patient_status = "waiting_for_doctor" # default status if no specialist is available
-
-    # If a specialist doctor is available, we assign the patient to that specialist and increment the specialist's active patient count.
-    if specialist:
-        assigned_specialist_id = specialist.id
-        specialist.active_patients += 1
-        patient_status = "assigned"
-
-    # If no specialist doctor is available,
-    # we check if there are any lower priority patients currently assigned to specialists in the same department
-    # that can be paused to free up a specialist for the higher priority patient.
-    else:
-        lower_priority_patient = (
-            db.query(Patient)
-            .filter(
-            Patient.status == "assigned",
-            Patient.triage_level > triage_level,
-            Patient.department_needed == department_needed
-        )
-        .order_by(Patient.triage_level.desc())# looking for the lowest priority patient first to pause
-        .first()
-    )
-        # If a lower priority patient is found, we pause their treatment by updating their status to "paused"
-        # and unassigning them from their specialist doctor.
-        if lower_priority_patient:
-            specialist = (
-                db.query(Doctor)
-                .filter(
-                    Doctor.id ==lower_priority_patient.assigned_doctor_id
-                    )
-                .first()
-            )
-            lower_priority_patient.status = "paused" # updating the lower priority patient's status to "paused" to indicate that their treatment is temporarily on hold
-            lower_priority_patient.assigned_doctor_id = None # unassigning the lower priority patient from their specialist doctor to free up the specialist for the higher priority patient
-            assigned_specialist_id = specialist.id # assigning the higher priority patient to the specialist doctor that was freed up by pausing the lower priority patient
-            specialist.active_patients += 1 # incrementing the active patient count for the specialist doctor to reflect the new assignment
-            patient_status = "assigned" # updating the higher priority patient's status to "assigned" to indicate that they have been successfully assigned to a specialist doctor
-        
-        # If no lower priority patient is found to pause, the higher priority patient remains unassigned 
-        # and their status is set to "waiting_for_doctor" until a specialist doctor becomes available.
-        else:
-            assigned_specialist_id = None
-            patient_status = "waiting_for_doctor"
+    assigned_specialist_id = allocation_result[
+        "assigned_specialist_id"
+    ]
+    patient_status = allocation_result[
+        "patient_status"
+    ]
 
     
     # Update patient record with new details from the GP's assessment
