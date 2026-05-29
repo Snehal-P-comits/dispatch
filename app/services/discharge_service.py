@@ -10,6 +10,9 @@ from app.models.discharged_patient import (
     DischargedPatient
 )
 
+# importing custom exception to handle cases where a patient is not found in the database during discharge process
+from app.exceptions import PatientNotFoundError
+
 # This function handles the discharge of a patient, updates the patient's status to "completed" and decrementing the active patient count for the assigned doctor if applicable.
 def discharge_patient(
     db: Session, # database session to interact with the database
@@ -26,7 +29,7 @@ def discharge_patient(
     # If the patient is not found in the database,
     # we raise a ValueError to indicate that the discharge cannot be completed.
     if not patient:
-        raise ValueError("Patient not found")
+        raise ValueError(f"Patient with id {patient_id} not found")
 
     # Storing the assigned doctor's ID if patient was assigned to a doctor
     assigned_doctor_id = patient.assigned_doctor_id

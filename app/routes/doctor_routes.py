@@ -1,3 +1,5 @@
+'''this file defines the API routes related to doctor operations'''
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 

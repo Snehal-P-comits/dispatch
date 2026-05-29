@@ -19,6 +19,9 @@ from app.services.triage_service import (
     allocate_specialist
 )
 
+# importing custom exception to handle cases where a patient is not found in the database during assessment process
+from app.exceptions import PatientNotFoundError
+
 
 
 # This function handles the assessment of a patient by a GP, including updating the patient's diagnosis notes,
@@ -42,7 +45,7 @@ def assess_patient(
     # If the patient is not found in the database,
     # we raise a ValueError to indicate that the assessment cannot be completed.
     if not patient:
-        raise ValueError("Patient not found")
+        raise PatientNotFoundError(f"Patient with id {patient_id} not found")
 
     #store the previous GP assignment before updating the patient record
     previous_gp_id = patient.assigned_doctor_id

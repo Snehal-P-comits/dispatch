@@ -1,4 +1,4 @@
-#routes for patient related operations
+'''routes for patient related operations'''
 
 #importing necessary modules and functions
 from fastapi import APIRouter, Depends
@@ -27,6 +27,15 @@ from app.schemas.discharged_patient_schema import (
 #importing the assess_patient function from the assessment service to handle patient assessment and potential referral to specialists.
 from app.services.assessment_service import (
     assess_patient
+)
+
+# importing HTTPException from FastAPI to handle HTTP exceptions that may arise during patient-related operations
+# like when a patient is not found in the database.
+from fastapi import HTTPException
+
+# importing custom exception to handle cases where a patient is not found in the database during patient-related operations
+from app.exceptions import (
+    PatientNotFoundError
 )
 
 #APIRouter is a class from FastAPI that allows you to create modular route handlers.
