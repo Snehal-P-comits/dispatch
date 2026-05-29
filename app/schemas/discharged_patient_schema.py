@@ -1,5 +1,8 @@
 from pydantic import BaseModel
 
+class DischargeRequest(BaseModel):
+    diagnosis_notes: str
+
 
 class DischargedPatientResponse(BaseModel):
     id: int

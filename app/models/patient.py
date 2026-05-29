@@ -74,7 +74,7 @@ class Patient(Base):
 
 '''So the table would look like this:
 # +----+---------------+----------------------------+-------------------+---------------------+--------------------+---------------+----------------------+
-# | id | patient_name  | issue                      | diagnosis_notes   | department_needed   | assigned_doctor_id | triage_level | status               |
+# | id | patient_name  | issue                      | diagnosis_notes   | department_needed   | assigned_doctor_id | triage_level  | status               |
 # +----+---------------+----------------------------+-------------------+---------------------+--------------------+---------------+----------------------+
 # | 1  | Snehal        | Chest pain                 | Possible cardiac  | Cardiology          |         2          |       1       | assigned             |
 # | 2  | SPOP          | Migraine                   | NULL              | NULL                |       NULL         |     NULL      | awaiting_assessment  |

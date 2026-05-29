@@ -21,6 +21,7 @@ from app.services.discharge_service import (
 
 #importing the DischargedPatientResponse schema to structure the response for discharged patient data.
 from app.schemas.discharged_patient_schema import (
+    DischargeRequest,
     DischargedPatientResponse
 )
 
@@ -89,16 +90,18 @@ def gp_assessment(
 '''========================================================================================================================'''
 # this endpoint handles the discharge of patients after treatment is completed
 @router.put(
-    "/discharge/{patient_id}", #the patient_id is passed as a path parameter to identify which patient is being discharged
+    "/discharge/{patient_id}",
     response_model=DischargedPatientResponse
 )
 def discharge_patient_route(
-    patient_id: int, #the id of the patient being discharged, extracted from the path parameter
-    db: Session = Depends(get_db)# creates a database session using the get_db function and injects the dependency
+    patient_id: int,
+    discharge_request: DischargeRequest,
+    db: Session = Depends(get_db)
 ):
     # the discharge_patient function is called to handle the business logic of patient discharge
     discharged_patient = discharge_patient(
         db=db,
-        patient_id=patient_id
+        patient_id=patient_id,
+        diagnosis_notes=discharge_request.diagnosis_notes
     )
     return discharged_patient

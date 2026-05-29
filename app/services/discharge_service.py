@@ -15,8 +15,9 @@ from app.exceptions import PatientNotFoundError
 
 # This function handles the discharge of a patient, updates the patient's status to "completed" and decrementing the active patient count for the assigned doctor if applicable.
 def discharge_patient(
-    db: Session, # database session to interact with the database
-    patient_id: int # the id of the patient being discharged
+    db: Session,
+    patient_id: int,
+    diagnosis_notes: str
 ):
     
     # query to find the patient being discharged in the DB
@@ -25,6 +26,8 @@ def discharge_patient(
         .filter(Patient.id == patient_id)
         .first()
     )
+    #updating patient's diagnosis notes with the notes provided during discharge
+    patient.diagnosis_notes = diagnosis_notes
 
     # If the patient is not found in the database,
     # we raise a ValueError to indicate that the discharge cannot be completed.
